@@ -113,7 +113,15 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-        
+        for (int c = 0; c < board.size(); c++) {
+            for (int r = 0; r < board.size(); r++) {
+                Tile t = tile(c, r);
+                if (isAboveValidSpace(c, r)) {
+                    board.move(c, r + 1, t);
+                }
+            }
+        }
+
 
         checkGameOver();
         if (changed) {
@@ -122,6 +130,24 @@ public class Model extends Observable {
         return changed;
     }
 
+//    public boolean spaceAboveFree(int c, int r) {
+//                if (r + 1 < board.size())
+//                    System.out.println(c + ", " + r + " = " + tile(c, r) + " and val above; " + c + ", " + (r + 1) + " = " + tile(c, r + 1));
+//                return isAboveValidSpace(c, r);
+//                }
+
+
+    public boolean isAboveValidSpace(int c, int r) {
+        if (r + 1 < board.size()) {
+
+            if (tile(c, r + 1) == null) {
+                return true;
+            } else if (tile(c, r + 1).value() == tile(c, r).value()) {
+                return true;
+            }
+        }
+        return false;
+    }
     /** Checks if the game is over and sets the gameOver variable
      *  appropriately.
      */
@@ -138,7 +164,6 @@ public class Model extends Observable {
      *  Empty spaces are stored as null.
      * */
     public static boolean emptySpaceExists(Board b) {
-        // TODO: Fill in this function.
         for (int i = 0; i < b.size(); i++) {
             for (int j = 0; j < b.size(); j++) {
                 if (b.tile(i, j) == null) {
@@ -155,7 +180,6 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        // TODO: Fill in this function.
         for (int i = 0; i < b.size(); i++) {
             for (int j = 0; j < b.size(); j++) {
                 if (b.tile(i, j) != null && b.tile(i, j).value() == MAX_PIECE) {
@@ -173,10 +197,10 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
         if (emptySpaceExists(b)) {
             return true;
         }
+
         for (int i = 0; i < b.size(); i++) {
             for (int j = 0; j < b.size(); j++){
                 if (emptySpaceExists(b)) {
