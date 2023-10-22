@@ -113,16 +113,25 @@ public class Model extends Observable {
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
+
+
         for (int c = 0; c < board.size(); c++) {
             for (int r = 0; r < board.size(); r++) {
                 Tile t = tile(c, r);
-                if (isAboveValidSpace(c, r)) {
-                    board.move(c, r + 1, t);
+                if (r + 1 < board.size()) {
+//                    System.out.println("Current Tile: " + c + ", " + r + " | Above Tile: " + c + ", " + (r + 1));
+//                    System.out.println("Current tile (" + c + ", " + r + ") can move up: " + isAboveTileAvailable(c, r));
+                    if (isAboveTileAvailable(c, r)) {
+                        if (board.move(c, r + 1, t)) {
+                            score += tile(c, r + 1).value();
+                        }
+                        changed = true;
+                    }
+                } else {
+                    continue;
                 }
             }
         }
-
-
         checkGameOver();
         if (changed) {
             setChanged();
@@ -130,24 +139,26 @@ public class Model extends Observable {
         return changed;
     }
 
-//    public boolean spaceAboveFree(int c, int r) {
-//                if (r + 1 < board.size())
-//                    System.out.println(c + ", " + r + " = " + tile(c, r) + " and val above; " + c + ", " + (r + 1) + " = " + tile(c, r + 1));
-//                return isAboveValidSpace(c, r);
-//                }
-
-
-    public boolean isAboveValidSpace(int c, int r) {
-        if (r + 1 < board.size()) {
-
-            if (tile(c, r + 1) == null) {
+    public boolean isAboveTileAvailable(int c, int r) {
+        if (r < 3) {
+            if (tile(c, r) == null) {
+                return false;
+            } if (mergeAvailable(c, r)) {
                 return true;
-            } else if (tile(c, r + 1).value() == tile(c, r).value()) {
+            } if (tile(c, r + 1) == null) {
                 return true;
             }
         }
         return false;
     }
+
+    public boolean mergeAvailable(int c, int r) {
+        if (tile(c, r + 1) != null && tile(c, r) != null && tile(c, r + 1).value() == tile(c, r).value()) {
+            return true;
+        }
+        return false;
+    }
+
     /** Checks if the game is over and sets the gameOver variable
      *  appropriately.
      */
